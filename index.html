@@ -8,9 +8,13 @@
 <body>
 
   <div>
-    <div id="div_view"></div>
+    <div id="view_div"></div>
   
-    <div id="div_formula"></div>
+    <div id="formula_div">
+      <form>
+        <label>k = </label><input type="number"/>
+      </form>
+    </div>
   </div>
   
   <!-- JS -->
@@ -18,8 +22,11 @@
   <script src="http://peterolson.github.com/BigInteger.js/BigInteger.min.js"></script>
   
   <script>
-    /* ARRAY 2D */
+    "use strict";
+    
+    /* --- ARRAY 2D -------------------------------------------------------- */
     var Array2D = (function() {
+    
       /**
        * @brief Constructor.
        */
@@ -36,27 +43,71 @@
         }
       }
       
+      
       Array2D.prototype.get = function(i, j) { return this.data[i][j]; };
       Array2D.prototype.set = function(i, j, val) { this.data[i][j] = val; };
+      
       
       return Array2D;
     } ());
     
     
-    /* APP */
+    /* --- TUPPER ---------------------------------------------------------- */
+    var Tupper = (function() {
+    
+      //! Converts k number to bit array.
+      var toArray = function(k) {
+        var array = new Array2D(106, 17, 0);
+        return array;
+      };
+      
+      
+      //! Converts an array to k number.
+      var toNumber = function(a) {
+      };
+      
+      
+      return {
+        toArray:  toArray,
+        toNumber: toNumber
+      };
+    } ());
+    
+    
+    /* --- APP ------------------------------------------------------------- */
     var App = (function() {
+    
+      //! Configuration.
+      var CONFIG = {
+        VIEW_DIV_ID:  '#view_div',
+        PLOT_WIDTH:   800,
+        PLOT_HEIGHT:  600
+      };
+      
+      
       /**
        * @brief Constructor.
        */
-      function App() { 
+      function App() {
+        this.plotCanvas = undefined;
+      
+        this.initialize();
       }
+      
       
       /**
        * @brief Initializes the application.
+       * Binds UI elements and event callbacks.
        */
       App.prototype.initialize = function() {
-        
+        // create the plot canvas
+        this.plotCanvas = $('<canvas/>').prop({
+          width: CONFIG.PLOT_WIDTH,
+          height: CONFIG.PLOT_HEIGHT
+        });
+        $(CONFIG.VIEW_DIV_ID).append(this.plotCanvas);
       };
+      
       
       /**
        * @brief Starts the application.
@@ -64,12 +115,18 @@
       App.prototype.run = function() {
         console.log('Starting!');
       };
+      
+      
+      //! Re-draws Tupper formula plot.
+      App.prototype.updatePlot = function() {
+      };
+    
     
       return App;
     } ());
   
   
-    /* MAIN */
+    /* --- MAIN ------------------------------------------------------------ */
     $(document).ready(function() {
       var app = new App();
       app.run();
