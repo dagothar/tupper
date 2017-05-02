@@ -66,10 +66,11 @@
     
       //! Converts k number to bit array.
       var toArray = function(k) {
-        var array = new Array2D(106, 17, 0);
+        var array = new Array2D(106, 17, '0');
         var num = k.divide(17);
         var bin = num.toString(2);
-        if (bin.length < 106*17) bin = '0' * (106*17-bin.length) + bin;
+        //if (bin.length < 106*17) bin = '0' * (106*17-bin.length) + bin;
+        console.log(bin);
         
         var k = bin.length-1;
         for (var i = 0; i < 106; ++i) {
@@ -88,7 +89,7 @@
         
         for (var i = 0; i < 106; ++i) {
           for (var j = 0; j < 17; ++j) {
-            bin.push(a.get(i, j));
+            bin = bin + a.get(i, j);
           }
         }
         
@@ -144,9 +145,29 @@
         this.formula    = undefined;
         this.k          = CONFIG.INIT_K;
         this.a          = Tupper.toArray(this.k);
+        this.paint      = '0';
       
         this.initialize();
       }
+      
+      
+      //! Mouse position helper.
+      var getMousePos = function(e, client) {
+        var rect = client.getBoundingClientRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      };
+      
+      
+      //! Determines Tupper array cell position based on the mouse click coordinates.
+      var getArrayPos = function(mousePos) {
+        return {
+          x: 106-Math.floor((mousePos.x-CONFIG.PLOT_X)/CONFIG.SQUARE_SIZE),
+          y: Math.floor((mousePos.y-CONFIG.PLOT_Y)/CONFIG.SQUARE_SIZE)
+        };
+      };
       
       
       /**
@@ -167,11 +188,43 @@
         // find formula input
         this.formula = $(CONFIG.K_INPUT);
         
-        // assign event handlers
+        // assign formula event handler
         this.formula.on('input change', function() {
           self.k = bigInt($(this).val());
           self.a = Tupper.toArray(self.k);
           self.updatePlot();
+        });
+        
+        // assign plot click event handler
+        this.plotCanvas.mousedown(function(e) {
+          var pos = getArrayPos(getMousePos(e, $(this).get(0)));
+          if (pos.x < 0 || pos.x >= 106 || pos.y < 0 || pos.y >= 17) return;
+          self.paint = self.a.get(pos.x, pos.y) == '1' ? '0' : '1';
+          self.a.set(pos.x, pos.y, self.paint);
+          
+          self.k = Tupper.toNumber(self.a);
+          
+          self.updateFormula();
+          self.updatePlot();
+          
+          $(this).bind('mousemove', function(e) {
+            var pos = getArrayPos(getMousePos(e, $(this).get(0)));
+            if (pos.x < 0 || pos.x >= 106 || pos.y < 0 || pos.y >= 17) return;
+            self.a.set(pos.x, pos.y, self.paint);
+            
+            self.k = Tupper.toNumber(self.a);
+            
+            self.updateFormula();
+            self.updatePlot();
+          });
+        });
+        
+        this.plotCanvas.mouseup(function(e) {
+          $(this).unbind('mousemove');
+        });
+  
+        this.plotCanvas.mouseout(function(e) {
+          $(this).unbind('mousemove');
         });
         
         this.updateFormula();
