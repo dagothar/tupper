@@ -11,9 +11,12 @@
     <div id="view_div"></div>
   
     <div id="formula_div">
-      <form>
-        <label>k = </label><input type="text" id="k_input"/>
-      </form>
+      <table>
+        <tr>
+          <td valign="middle">k =</td>
+          <td valign="middle"><textarea id="k_input" rows="10" cols="80" style="resize: none"></textarea></td>
+        </tr>
+      </table>
     </div>
   </div>
   
@@ -123,10 +126,12 @@
       var CONFIG = {
         VIEW_DIV_ID:  '#view_div',
         K_INPUT:      '#k_input',
-        PLOT_WIDTH:   600,
-        PLOT_HEIGHT:  120,
+        INIT_K:       Tupper.TUPPER,
+        PLOT_WIDTH:   620,
+        PLOT_HEIGHT:  150,
         SQUARE_SIZE:  5,
-        INIT_K:       Tupper.TUPPER
+        PLOT_X:       50,
+        PLOT_Y:       25
       };
       
       
@@ -136,6 +141,7 @@
       function App() {
         this.plotCanvas = undefined;
         this.ctx        = undefined;
+        this.formula    = undefined;
         this.k          = CONFIG.INIT_K;
         this.a          = Tupper.toArray(this.k);
       
@@ -155,6 +161,11 @@
         });
         $(CONFIG.VIEW_DIV_ID).append(this.plotCanvas);
         this.ctx = this.plotCanvas.get(0).getContext('2d');
+        
+        this.formula = $(CONFIG.K_INPUT);
+        
+        this.updateFormula();
+        this.updatePlot();
       };
       
       
@@ -162,14 +173,68 @@
        * @brief Starts the application.
        */
       App.prototype.run = function() {
+        this.updatePlot();
       };
       
       
       //! Re-draws Tupper formula plot.
-      App.prototype.updatePlot = function(ctx, x, y, k) {
+      App.prototype.updatePlot = function() {
+        var ctx = this.ctx;
         
+        Tupper.draw(ctx, CONFIG.PLOT_X, CONFIG.PLOT_Y, this.a, CONFIG.SQUARE_SIZE);
+        
+        // plot axes etc.
         ctx.save();
+          ctx.strokeStyle = 'gray';
+          
+          // Y axis
+          ctx.beginPath();
+          ctx.moveTo(CONFIG.PLOT_X, CONFIG.PLOT_Y-10);
+          ctx.lineTo(CONFIG.PLOT_X, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE);
+          ctx.closePath();
+          ctx.stroke();
+          
+          // X axis
+          ctx.beginPath();
+          ctx.moveTo(CONFIG.PLOT_X, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE);
+          ctx.lineTo(CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE+10, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE);
+          ctx.closePath();
+          ctx.stroke();
+          
+          // ticks
+          ctx.font = '16px Times New Roman';
+          ctx.beginPath();
+          ctx.moveTo(CONFIG.PLOT_X-CONFIG.SQUARE_SIZE/2, CONFIG.PLOT_Y);
+          ctx.lineTo(CONFIG.PLOT_X+CONFIG.SQUARE_SIZE/2, CONFIG.PLOT_Y);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fillText('k', CONFIG.PLOT_X-40, CONFIG.PLOT_Y+6);
+          ctx.beginPath();
+          ctx.moveTo(CONFIG.PLOT_X-CONFIG.SQUARE_SIZE/2, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE);
+          ctx.lineTo(CONFIG.PLOT_X+CONFIG.SQUARE_SIZE/2, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fillText('k+17', CONFIG.PLOT_X-40, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+6);
+          
+          ctx.beginPath();
+          ctx.moveTo(CONFIG.PLOT_X, CONFIG.PLOT_Y+16.5*CONFIG.SQUARE_SIZE);
+          ctx.lineTo(CONFIG.PLOT_X, CONFIG.PLOT_Y+17.5*CONFIG.SQUARE_SIZE);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fillText('0', CONFIG.PLOT_X, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+20);
+          ctx.beginPath();
+          ctx.moveTo(CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+16.5*CONFIG.SQUARE_SIZE);
+          ctx.lineTo(CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+17.5*CONFIG.SQUARE_SIZE);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fillText('106', CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+20);
         ctx.restore();
+      };
+      
+      
+      //! Updates the formula field.
+      App.prototype.updateFormula = function() {
+        this.formula.val(this.k.toString());
       };
     
     
