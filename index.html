@@ -1,0 +1,81 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8"/>
+  <title>Tupper's Self-Referential Formula</title>
+</head>
+
+<body>
+
+  <div>
+    <div id="div_view"></div>
+  
+    <div id="div_formula"></div>
+  </div>
+  
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="http://peterolson.github.com/BigInteger.js/BigInteger.min.js"></script>
+  
+  <script>
+    /* ARRAY 2D */
+    var Array2D = (function() {
+      /**
+       * @brief Constructor.
+       */
+      function Array2D(width, height, value) {
+        if (value === undefined) value = 0;
+        this.width = width;
+        this.height = height;
+        this.data = [];
+        for (var i = 0; i < width; ++i) {
+          data[i] = [];
+          for (var j = 0; j < height; ++j) {
+            data[i].push(value);
+          }
+        }
+      }
+      
+      Array2D.prototype.get = function(i, j) { return this.data[i][j]; };
+      Array2D.prototype.set = function(i, j, val) { this.data[i][j] = val; };
+      
+      return Array2D;
+    } ());
+    
+    
+    /* APP */
+    var App = (function() {
+      /**
+       * @brief Constructor.
+       */
+      function App() { 
+      }
+      
+      /**
+       * @brief Initializes the application.
+       */
+      App.prototype.initialize = function() {
+        
+      };
+      
+      /**
+       * @brief Starts the application.
+       */
+      App.prototype.run = function() {
+        console.log('Starting!');
+      };
+    
+      return App;
+    } ());
+  
+  
+    /* MAIN */
+    $(document).ready(function() {
+      var app = new App();
+      app.run();
+    });
+  </script>
+
+</body>
+
+</html>
