@@ -154,6 +154,8 @@
        * Binds UI elements and event callbacks.
        */
       App.prototype.initialize = function() {
+        var self = this;
+        
         // create the plot canvas
         this.plotCanvas = $('<canvas/>').prop({
           width: CONFIG.PLOT_WIDTH,
@@ -162,7 +164,15 @@
         $(CONFIG.VIEW_DIV_ID).append(this.plotCanvas);
         this.ctx = this.plotCanvas.get(0).getContext('2d');
         
+        // find formula input
         this.formula = $(CONFIG.K_INPUT);
+        
+        // assign event handlers
+        this.formula.on('input change', function() {
+          self.k = bigInt($(this).val());
+          self.a = Tupper.toArray(self.k);
+          self.updatePlot();
+        });
         
         this.updateFormula();
         this.updatePlot();
@@ -221,13 +231,13 @@
           ctx.lineTo(CONFIG.PLOT_X, CONFIG.PLOT_Y+17.5*CONFIG.SQUARE_SIZE);
           ctx.closePath();
           ctx.stroke();
-          ctx.fillText('0', CONFIG.PLOT_X, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+20);
+          ctx.fillText('106', CONFIG.PLOT_X, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+20);
           ctx.beginPath();
           ctx.moveTo(CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+16.5*CONFIG.SQUARE_SIZE);
           ctx.lineTo(CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+17.5*CONFIG.SQUARE_SIZE);
           ctx.closePath();
           ctx.stroke();
-          ctx.fillText('106', CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+20);
+          ctx.fillText('0', CONFIG.PLOT_X+106*CONFIG.SQUARE_SIZE, CONFIG.PLOT_Y+17*CONFIG.SQUARE_SIZE+20);
         ctx.restore();
       };
       
