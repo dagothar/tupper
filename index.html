@@ -12,7 +12,7 @@
   
     <div id="formula_div">
       <form>
-        <label>k = </label><input type="number"/>
+        <label>k = </label><input type="text" id="k_input"/>
       </form>
     </div>
   </div>
@@ -36,9 +36,9 @@
         this.height = height;
         this.data = [];
         for (var i = 0; i < width; ++i) {
-          data[i] = [];
+          this.data[i] = [];
           for (var j = 0; j < height; ++j) {
-            data[i].push(value);
+            this.data[i].push(value);
           }
         }
       }
@@ -55,21 +55,63 @@
     /* --- TUPPER ---------------------------------------------------------- */
     var Tupper = (function() {
     
+      //! Original Tupper's constant.
+      var TUPPER = bigInt('960939379918958884971672962127852754715004339660129306651505519271702802395266424689642842174350718121267153782770623355993237280874144307891325963941337723487857735749823926629715517173716995165232890538221612403238855866184013235585136048828693337902491454229288667081096184496091705183454067827731551705405381627380967602565625016981482083418783163849115590225610003652351370343874461848378737238198224849863465033159410054974700593138339226497249461751545728366702369745461014655997933798537483143786841806593422227898388722980000748404719');
+    
+      //! Matt Parker's constant.
+      var PARKER = bigInt('96093937991895888497167');
+    
       //! Converts k number to bit array.
       var toArray = function(k) {
         var array = new Array2D(106, 17, 0);
+        var num = k.divide(17);
+        var bin = num.toString(2);
+        if (bin.length < 106*17) bin = '0' * (106*17-bin.length) + bin;
+        
+        var k = bin.length-1;
+        for (var i = 0; i < 106; ++i) {
+          for (var j = 0; j < 17; ++j) {
+            array.set(i, j, bin[k--]);
+          }
+        }
+        
         return array;
       };
       
       
       //! Converts an array to k number.
       var toNumber = function(a) {
+        var bin = '';
+        
+        for (var i = 0; i < 106; ++i) {
+          for (var j = 0; j < 17; ++j) {
+            bin.push(a.get(i, j));
+          }
+        }
+        
+        return bigInt(bin, 2);
+      };
+      
+      
+      //! Draws the Tupper array onto a context.
+      var draw = function(ctx, x, y, a, size) {
+        ctx.save();
+          for (var i = 0; i < 106; ++i) {
+            for (var j = 0; j < 17; ++j) {
+              ctx.fillStyle = a.get(i, j) == '1' ? 'black' : 'white';
+              ctx.fillRect(x+(106-i)*size, y+j*size, size, size);
+              ctx.fill();
+            }
+          }
+        ctx.restore();
       };
       
       
       return {
+        TUPPER:   TUPPER,
         toArray:  toArray,
-        toNumber: toNumber
+        toNumber: toNumber,
+        draw:     draw
       };
     } ());
     
@@ -80,8 +122,11 @@
       //! Configuration.
       var CONFIG = {
         VIEW_DIV_ID:  '#view_div',
-        PLOT_WIDTH:   800,
-        PLOT_HEIGHT:  600
+        K_INPUT:      '#k_input',
+        PLOT_WIDTH:   600,
+        PLOT_HEIGHT:  120,
+        SQUARE_SIZE:  5,
+        INIT_K:       Tupper.TUPPER
       };
       
       
@@ -90,6 +135,9 @@
        */
       function App() {
         this.plotCanvas = undefined;
+        this.ctx        = undefined;
+        this.k          = CONFIG.INIT_K;
+        this.a          = Tupper.toArray(this.k);
       
         this.initialize();
       }
@@ -106,6 +154,7 @@
           height: CONFIG.PLOT_HEIGHT
         });
         $(CONFIG.VIEW_DIV_ID).append(this.plotCanvas);
+        this.ctx = this.plotCanvas.get(0).getContext('2d');
       };
       
       
@@ -113,12 +162,14 @@
        * @brief Starts the application.
        */
       App.prototype.run = function() {
-        console.log('Starting!');
       };
       
       
       //! Re-draws Tupper formula plot.
-      App.prototype.updatePlot = function() {
+      App.prototype.updatePlot = function(ctx, x, y, k) {
+        
+        ctx.save();
+        ctx.restore();
       };
     
     
